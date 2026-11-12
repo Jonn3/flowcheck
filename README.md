@@ -86,6 +86,7 @@ A request for approval and an approval decision are separate records. Guard G-AP
 - [Case study](docs/CASE_STUDY.md)
 - [Contribution and AI assistance](docs/CONTRIBUTION.md)
 - [Deployment preparation](docs/DEPLOYMENT.md)
+- [Predict-then-run exercise](docs/EXERCISE.md)
 
 ## Privacy
 
