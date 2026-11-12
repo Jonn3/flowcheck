@@ -209,15 +209,29 @@ export function fingerprint(run: Run): string {
   return h.toString(16).padStart(8, '0');
 }
 
-const signature = (e: TraceEntry) => `${e.at}|${e.causeId}|${e.ruleId}|${e.action}|${e.outcome}|${e.taskId ?? ''}|${e.to ?? ''}`;
+// An accepted delivery has the same effect whichever duplicate rule accepted it,
+// so the rule id is left out there. Otherwise every run with a different
+// duplicate rule would "differ" at its very first entry.
+const signature = (e: TraceEntry) =>
+  `${e.at}|${e.causeId}|${e.action === 'delivery.accepted' ? '' : e.ruleId}|${e.action}|${e.outcome}|${e.taskId ?? ''}|${e.to ?? ''}`;
 
-/** The first point where two runs of the same inputs stop matching. */
+/**
+ * The first point where two runs of the same inputs make a different decision.
+ * Timer checks that found nothing to do (escalation.skipped) are left out: they
+ * exist in one run and not the other without changing any outcome.
+ * `index` is the position of the differing entry in the revised trace.
+ */
 export function firstDivergence(base: Run, revised: Run): { index: number; base: TraceEntry | null; revised: TraceEntry | null } | null {
-  const n = Math.max(base.trace.length, revised.trace.length);
+  const material = (e: TraceEntry) => e.action !== 'escalation.skipped';
+  const a = base.trace.filter(material);
+  const b = revised.trace.filter(material);
+  const n = Math.max(a.length, b.length);
   for (let i = 0; i < n; i++) {
-    const a = base.trace[i];
-    const b = revised.trace[i];
-    if (!a || !b || signature(a) !== signature(b)) return { index: i, base: a ?? null, revised: b ?? null };
+    const x = a[i];
+    const y = b[i];
+    if (!x || !y || signature(x) !== signature(y)) {
+      return { index: y ? y.seq : revised.trace.length - 1, base: x ?? null, revised: y ?? null };
+    }
   }
   return null;
 }

@@ -364,9 +364,17 @@ test('every trace entry names a known rule, time never runs backwards, applied c
 
 test('firstDivergence points at the delivery the fix handled differently', () => {
   const d = firstDivergence(runOption('duplicate', null), runOption('duplicate', 'key'))!;
-  assert.equal(d.base!.causeId, 'D-101');
-  assert.equal(d.base!.ruleId, 'R-DEDUP-NONE');
+  assert.equal(d.base!.causeId, 'D-102');
+  assert.equal(d.base!.action, 'delivery.accepted');
+  assert.equal(d.revised!.causeId, 'D-102');
+  assert.equal(d.revised!.action, 'delivery.suppressed');
   assert.equal(d.revised!.ruleId, 'R-DEDUP-KEY');
+  const b = firstDivergence(runOption('approval', null), runOption('approval', 'backup'))!;
+  assert.equal(b.revised!.action, 'escalation.sent');
+  assert.equal(b.revised!.taskId, 'T-203');
+  const c = firstDivergence(runOption('assignment', null), runOption('assignment', 'flag'))!;
+  assert.equal(c.base!.ruleId, 'R-ASSIGN-DEFAULT');
+  assert.equal(c.revised!.ruleId, 'R-ASSIGN-FLAG');
   assert.equal(firstDivergence(runOption('duplicate', null), runOption('duplicate', null)), null);
 });
 
