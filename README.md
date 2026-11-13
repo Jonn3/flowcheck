@@ -2,6 +2,8 @@
 
 **Can you rescue this customer implementation?**
 
+**[Try the live demo →](https://jonn3.github.io/flowcheck/)** It takes about a minute and runs entirely in your browser.
+
 FlowCheck is an interactive workflow simulation. A fictional B2B software company, Fernhollow Software, is onboarding a customer and the process is failing in three ways. You investigate each failure, change one rule and replay the same inputs to see what your decision changes.
 
 It is a portfolio project by Jon Johnson. All companies, people and data are invented, and every result is a simulated outcome.
